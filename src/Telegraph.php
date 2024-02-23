@@ -39,17 +39,6 @@ class Telegraph
     use InteractWithUsers;
     use InteractsWithCommands;
 
-    public const MAX_DOCUMENT_SIZE_IN_MB = 50;
-    public const MAX_ANIMATION_SIZE_IN_MB = 50;
-    public const MAX_VIDEO_SIZE_IN_MB = 50;
-    public const MAX_PHOTO_SIZE_IN_MB = 10;
-    public const MAX_PHOTO_HEIGHT_WIDTH_TOTAL = 10000;
-    public const MAX_PHOTO_HEIGHT_WIDTH_RATIO = 20;
-    public const MAX_THUMBNAIL_SIZE_IN_KB = 200;
-    public const MAX_THUMBNAIL_HEIGHT = 320;
-    public const MAX_THUMBNAIL_WIDTH = 320;
-    public const ALLOWED_THUMBNAIL_TYPES = ['jpg'];
-
 
     public const PARSE_HTML = 'html';
     public const PARSE_MARKDOWN = 'markdown';
@@ -83,6 +72,7 @@ class Telegraph
     public const ENDPOINT_SEND_DOCUMENT = 'sendDocument';
     public const ENDPOINT_SEND_PHOTO = 'sendPhoto';
     public const ENDPOINT_SEND_VIDEO = 'sendVideo';
+    public const ENDPOINT_SEND_AUDIO = 'sendAudio';
     public const ENDPOINT_SEND_CONTACT = 'sendContact';
     public const ENDPOINT_GET_FILE = 'getFile';
     public const ENDPOINT_ANSWER_INLINE_QUERY = 'answerInlineQuery';
@@ -105,6 +95,7 @@ class Telegraph
     public const ENDPOINT_PROMOTE_CHAT_MEMBER = 'promoteChatMember';
     public const ENDPOINT_SEND_POLL = 'sendPoll';
     public const ENDPOINT_FORWARD_MESSAGE = 'forwardMessage';
+    public const ENDPOINT_COPY_MESSAGE = 'copyMessage';
     public const ENDPOINT_GET_USER_PROFILE_PHOTOS = 'getUserProfilePhotos';
     public const ENDPOINT_SET_CHAT_MENU_BUTTON = 'setChatMenuButton';
     public const ENDPOINT_GET_CHAT_MENU_BUTTON = 'getChatMenuButton';

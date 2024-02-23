@@ -9,6 +9,7 @@ namespace DefStudio\Telegraph\Models;
 use DefStudio\Telegraph\Concerns\HasStorage;
 use DefStudio\Telegraph\Contracts\Storable;
 use DefStudio\Telegraph\Database\Factories\TelegraphChatFactory;
+use DefStudio\Telegraph\DTO\ChatMember;
 use DefStudio\Telegraph\Exceptions\TelegraphException;
 use DefStudio\Telegraph\Facades\Telegraph as TelegraphFacade;
 use DefStudio\Telegraph\Keyboard\Keyboard;
@@ -16,6 +17,7 @@ use DefStudio\Telegraph\ScopedPayloads\SetChatMenuButtonPayload;
 use DefStudio\Telegraph\ScopedPayloads\TelegraphPollPayload;
 use DefStudio\Telegraph\ScopedPayloads\TelegraphQuizPayload;
 use DefStudio\Telegraph\Telegraph;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -41,7 +43,7 @@ class TelegraphChat extends Model implements Storable
         'name',
     ];
 
-    protected static function newFactory(): TelegraphChatFactory
+    protected static function newFactory(): Factory
     {
         return TelegraphChatFactory::new();
     }
@@ -68,7 +70,7 @@ class TelegraphChat extends Model implements Storable
     }
 
     /**
-     * @return array{id: integer, type: string, title?: string, description?: string, username?: string, first_name?: string, last_name?: string, photo?: array<string, mixed>, pinned_message?: array<string, mixed>, permissions?: array<string, mixed>, bio?: string, has_private_forwards?: true, has_restricted_voice_and_video_messages?: true, join_to_send_messages?: true, join_by_request?: true, has_protected_content?: true, invite_link?: string, sticker_set_name?: string, sticker_set_name?: true, linked_chat_id?: integer, slow_mode_delay?: integer, location?: array<string, mixed>, message_auto_delete_time?: integer}
+     * @return array{id: int, type: string, title?: string, description?: string, username?: string, first_name?: string, last_name?: string, photo?: array<string, mixed>, pinned_message?: array<string, mixed>, permissions?: array<string, mixed>, bio?: string, has_private_forwards?: true, has_restricted_voice_and_video_messages?: true, join_to_send_messages?: true, join_by_request?: true, has_protected_content?: true, invite_link?: string, sticker_set_name?: string, sticker_set_name?: true, linked_chat_id?: int, slow_mode_delay?: int, location?: array<string, mixed>, message_auto_delete_time?: int}
      */
     public function info(): array
     {
@@ -92,6 +94,22 @@ class TelegraphChat extends Model implements Storable
 
         /* @phpstan-ignore-next-line */
         return $reply->json('result');
+    }
+
+    public function memberInfo(string $user_id): null|ChatMember
+    {
+        $reply = TelegraphFacade::chat($this)->chatMember($user_id)->send();
+
+        if ($reply->telegraphError()) {
+            throw TelegraphException::failedToRetrieveChatInfo();
+        }
+
+        if (!$reply->json('result')) {
+            return null;
+        }
+
+        /* @phpstan-ignore-next-line */
+        return ChatMember::fromArray($reply->json('result'));
     }
 
     public function withData(string $key, mixed $value): Telegraph
@@ -205,6 +223,11 @@ class TelegraphChat extends Model implements Storable
     public function video(string $path, string $filename = null): Telegraph
     {
         return TelegraphFacade::chat($this)->video($path, $filename);
+    }
+
+    public function audio(string $path, string $filename = null): Telegraph
+    {
+        return TelegraphFacade::chat($this)->audio($path, $filename);
     }
 
     public function voice(string $path, string $filename = null): Telegraph
@@ -329,5 +352,10 @@ class TelegraphChat extends Model implements Storable
     public function setMenuButton(): SetChatMenuButtonPayload
     {
         return TelegraphFacade::chat($this)->setChatMenuButton();
+    }
+
+    public function copyMessage(TelegraphChat|int $fromChat, int $messageId): Telegraph
+    {
+        return TelegraphFacade::chat($this)->copyMessage($fromChat, $messageId);
     }
 }

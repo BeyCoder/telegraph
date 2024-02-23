@@ -222,7 +222,7 @@ it('can send a animation from file_id', function () {
     ]);
 });
 
-it('can send an video', function () {
+it('can send a video', function () {
     Telegraph::fake();
     $chat = make_chat();
 
@@ -232,6 +232,7 @@ it('can send an video', function () {
         'video' => new Attachment(Storage::path('video.mp4'), 'video.mp4'),
     ]);
 });
+
 
 it('can send a video from remote url', function () {
     Telegraph::fake();
@@ -254,6 +255,41 @@ it('can send a video from file_id', function () {
 
     Telegraph::assertSentData(\DefStudio\Telegraph\Telegraph::ENDPOINT_SEND_VIDEO, [
         'video' => $uuid,
+    ]);
+});
+
+it('can send an audio', function () {
+    Telegraph::fake();
+    $chat = make_chat();
+
+    $chat->audio(Storage::path('audio.mp3'))->markdown('test')->send();
+
+    Telegraph::assertSentFiles(\DefStudio\Telegraph\Telegraph::ENDPOINT_SEND_AUDIO, [
+        'audio' => new Attachment(Storage::path('audio.mp3'), 'audio.mp3'),
+    ]);
+});
+
+it('can send an audio from remote url', function () {
+    Telegraph::fake();
+    $chat = make_chat();
+
+    $chat->audio('https://test.dev/audio.mp3')->markdown('test')->send();
+
+    Telegraph::assertSentData(\DefStudio\Telegraph\Telegraph::ENDPOINT_SEND_AUDIO, [
+        'audio' => 'https://test.dev/audio.mp3',
+    ]);
+});
+
+it('can send an audio from file_id', function () {
+    Telegraph::fake();
+    $chat = make_chat();
+
+    $uuid = Str::uuid();
+
+    $chat->audio($uuid)->markdown('test')->send();
+
+    Telegraph::assertSentData(\DefStudio\Telegraph\Telegraph::ENDPOINT_SEND_AUDIO, [
+        'audio' => $uuid,
     ]);
 });
 
@@ -338,6 +374,15 @@ it('can edit a media messages with a video', function () {
     $chat->editMedia(42)->video('www.newMediaUrl.com')->send();
 
     TelegraphEditMediaFake::assertSentEditMedia('video', 'www.newMediaUrl.com');
+});
+
+it('can edit a media messages with an audio', function () {
+    Telegraph::fake();
+    $chat = make_chat();
+
+    $chat->editMedia(42)->audio('www.newMediaUrl.com')->send();
+
+    TelegraphEditMediaFake::assertSentEditMedia('audio', 'www.newMediaUrl.com');
 });
 
 it('can delete a message', function () {
@@ -436,6 +481,15 @@ it('can retrieve its member count', function () {
     $chat->memberCount();
 
     Telegraph::assertSentData(\DefStudio\Telegraph\Telegraph::ENDPOINT_GET_CHAT_MEMBER_COUNT);
+});
+
+it('can retrieve its member info', function () {
+    Telegraph::fake();
+    $chat = make_chat();
+
+    $chat->memberInfo(123456);
+
+    Telegraph::assertSentData(\DefStudio\Telegraph\Telegraph::ENDPOINT_GET_CHAT_MEMBER);
 });
 
 it('can generate a primary invite link', function () {
@@ -606,6 +660,17 @@ it('can forward a message', function () {
     $chat->forwardMessage($chat, 123)->send();
 
     Telegraph::assertSentData(\DefStudio\Telegraph\Telegraph::ENDPOINT_FORWARD_MESSAGE, [
+        'from_chat_id' => $chat->chat_id,
+        'message_id' => 123,
+    ]);
+});
+it('can copy a message', function () {
+    Telegraph::fake();
+    $chat = make_chat();
+
+    $chat->copyMessage($chat, 123)->send();
+
+    Telegraph::assertSentData(\DefStudio\Telegraph\Telegraph::ENDPOINT_COPY_MESSAGE, [
         'from_chat_id' => $chat->chat_id,
         'message_id' => 123,
     ]);

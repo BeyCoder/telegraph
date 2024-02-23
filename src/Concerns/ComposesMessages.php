@@ -36,7 +36,7 @@ trait ComposesMessages
             $telegraph->setMessageText($message);
         }
 
-        $telegraph->data['parse_mode'] = 'html';
+        $telegraph->data['parse_mode'] = Telegraph::PARSE_HTML;
 
         return $telegraph;
     }
@@ -49,7 +49,7 @@ trait ComposesMessages
             $telegraph->setMessageText($message);
         }
 
-        $telegraph->data['parse_mode'] = 'markdown';
+        $telegraph->data['parse_mode'] = Telegraph::PARSE_MARKDOWN;
 
         return $telegraph;
     }
@@ -62,7 +62,7 @@ trait ComposesMessages
             $telegraph->setMessageText($message);
         }
 
-        $telegraph->data['parse_mode'] = 'MarkdownV2';
+        $telegraph->data['parse_mode'] = Telegraph::PARSE_MARKDOWNV2;
 
         return $telegraph;
     }
@@ -171,6 +171,22 @@ trait ComposesMessages
         $telegraph = clone $this;
 
         $telegraph->endpoint = self::ENDPOINT_FORWARD_MESSAGE;
+        $telegraph->data = [
+            'chat_id' => $telegraph->getChatId(),
+            'message_id' => $messageId,
+            'from_chat_id' => $fromChatId,
+        ];
+
+        return $telegraph;
+    }
+
+    public function copyMessage(TelegraphChat|int $fromChat, int $messageId): Telegraph
+    {
+        $fromChatId = is_int($fromChat) ? $fromChat : $fromChat->chat_id;
+
+        $telegraph = clone $this;
+
+        $telegraph->endpoint = self::ENDPOINT_COPY_MESSAGE;
         $telegraph->data = [
             'chat_id' => $telegraph->getChatId(),
             'message_id' => $messageId,
