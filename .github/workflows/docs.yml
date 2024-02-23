@@ -17,13 +17,15 @@ jobs:
       - name: Setup node env
         uses: actions/setup-node@v2.1.2
         with:
-          node-version: 14
+          node-version: 16
 
       - name: Install dependencies
         run: cd docs && npm install
 
       - name: Generate
         run: cd docs && npm run generate
+        env:
+          NUXT_APP_BASE_URL: /telegraph
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3

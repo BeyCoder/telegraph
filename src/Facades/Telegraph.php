@@ -47,6 +47,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static \DefStudio\Telegraph\Telegraph  location(float $latitude, float $longitude)
  * @method static \DefStudio\Telegraph\Telegraph  contact(string $phoneNumber, string $firstName)
  * @method static \DefStudio\Telegraph\Telegraph  video(string $path, string $filename = null)
+ * @method static \DefStudio\Telegraph\Telegraph  audio(string $path, string $filename = null)
  * @method static \DefStudio\Telegraph\Telegraph  dice()
  * @method static \DefStudio\Telegraph\Telegraph  botUpdates()
  * @method static \DefStudio\Telegraph\Telegraph  botInfo()
@@ -100,6 +101,16 @@ class Telegraph extends Facade
         static::swap($fake = new TelegraphFake($replies));
 
         return $fake;
+    }
+
+    public static function getFacadeRoot()
+    {
+        $instance = parent::getFacadeRoot();
+        if ($instance instanceof TelegraphFake) {
+            $instance->prepareForNewRequest();
+        }
+
+        return $instance;
     }
 
     protected static function getFacadeAccessor(): string

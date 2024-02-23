@@ -18,6 +18,7 @@ use DefStudio\Telegraph\Exceptions\TelegraphException;
 use DefStudio\Telegraph\Facades\Telegraph as TelegraphFacade;
 use DefStudio\Telegraph\Telegraph;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -43,7 +44,7 @@ class TelegraphBot extends Model implements Storable
         'name',
     ];
 
-    protected static function newFactory(): TelegraphBotFactory
+    protected static function newFactory(): Factory
     {
         return TelegraphBotFactory::new();
     }
@@ -141,7 +142,7 @@ class TelegraphBot extends Model implements Storable
     }
 
     /**
-     * @return array{id: integer, is_bot: bool, first_name: string, username: string, can_join_groups: bool, can_read_all_group_messages: bool, support_inline_queries: bool}
+     * @return array{id: int, is_bot: bool, first_name: string, username: string, can_join_groups: bool, can_read_all_group_messages: bool, support_inline_queries: bool}
      */
     public function info(): array
     {
@@ -171,11 +172,13 @@ class TelegraphBot extends Model implements Storable
     }
 
     /**
+     * @param string[]|null $allowedUpdates
+     *
      * @return \Illuminate\Support\Collection<int, TelegramUpdate>
      */
-    public function updates(): \Illuminate\Support\Collection
+    public function updates(int $timeout = null, int $offset = null, int $limit = null, array $allowedUpdates = null): \Illuminate\Support\Collection
     {
-        $reply = TelegraphFacade::bot($this)->botUpdates()->send();
+        $reply = TelegraphFacade::bot($this)->botUpdates($timeout, $offset, $limit, $allowedUpdates)->send();
 
         if ($reply->telegraphError()) {
             if (!$reply->successful()) {
