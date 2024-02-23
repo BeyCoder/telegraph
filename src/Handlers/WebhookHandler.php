@@ -58,7 +58,7 @@ abstract class WebhookHandler
         $action = $this->callbackQuery?->data()->get('action') ?? '';
 
         if (!$this->canHandle($action)) {
-            $this->handleUnknownCallbackQuery($action);
+            $this->handleUnknownCallbackQuery(new Stringable($action));
 
             return;
         }
@@ -66,10 +66,11 @@ abstract class WebhookHandler
         $this->$action();
     }
 
-    protected function handleUnknownCallbackQuery(string $action): void
+    protected function handleUnknownCallbackQuery(Stringable $text): void
     {
-        report(TelegramWebhookException::invalidAction($action));
-        $this->reply(__('telegraph::errors.invalid_action'));
+        if ($this->message?->chat()?->type() === Chat::TYPE_PRIVATE) {
+            $this->chat->html(__('telegraph::errors.invalid_action'))->send();
+        }
     }
 
     private function handleCommand(Stringable $text): void

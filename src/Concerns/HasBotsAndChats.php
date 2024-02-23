@@ -18,8 +18,8 @@ use DefStudio\Telegraph\Models\TelegraphBot;
 use DefStudio\Telegraph\Models\TelegraphChat;
 use DefStudio\Telegraph\ScopedPayloads\SetChatMenuButtonPayload;
 use DefStudio\Telegraph\Telegraph;
-use File;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\File;
 
 /**
  * @mixin Telegraph
@@ -29,6 +29,15 @@ trait HasBotsAndChats
     protected TelegraphBot|string|null $bot;
 
     protected TelegraphChat|string|null $chat;
+
+    public function toEndpoint(string $endpoint): Telegraph
+    {
+        $telegraph = clone $this;
+
+        $telegraph->endpoint = $endpoint;
+
+        return $telegraph;
+    }
 
     public function bot(TelegraphBot|string $bot): Telegraph
     {
